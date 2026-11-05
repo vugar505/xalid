@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xəbərdarlıq</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            font-family: 'Arial', sans-serif;
+            cursor: pointer;
+        }
+
+        /* Başlanğıc Ekranı */
+        #start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            z-index: 10;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            font-size: 20px;
+            color: #fff;
+            background-color: #8b0000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 0 15px #ff0000;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #ff0000;
+            transform: scale(1.05);
+        }
+
+        /* Qorxutma Ekranı (Jump Scare) */
+        #scare-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000;
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        /* Titrəmə animasiyası */
+        .shake {
+            animation: shakeAnim 0.05s infinite alternate;
+        }
+
+        @keyframes shakeAnim {
+            0% { transform: translate(10px, 10px) scale(1.1); }
+            100% { transform: translate(-10px, -10px) scale(1.15); }
+        }
+
+        /* Ekranın qırmızı yanıb-sönməsi */
+        .flash {
+            animation: flashAnim 0.1s infinite;
+        }
+
+        @keyframes flashAnim {
+            0% { background-color: #000; }
+            50% { background-color: #ff0000; }
+            100% { background-color: #000; }
+        }
+
+        #scare-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        #scare-text {
+            position: absolute;
+            bottom: 10%;
+            width: 100%;
+            text-align: center;
+            color: #ff0000;
+            font-size: 80px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 0 0 20px #000, 0 0 40px #000, 0 0 10px #ffffff;
+            z-index: 101;
+            font-family: 'Impact', sans-serif;
+        }
+
+        @media (max-width: 768px) {
+            #scare-text {
+                font-size: 45px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Başlanğıc Ekranı -->
+    <div id="start-screen">
+        <button class="btn" onclick="triggerScare()">Daxil olmaq üçün klikləyin</button>
+    </div>
+
+    <!-- Qorxutma Ekranı -->
+    <div id="scare-screen" class="shake flash">
+        <img id="scare-img" src="505.jpg" alt="Scare Image" onerror="this.src='https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=1000&auto=format&fit=crop'">
+        <h1 id="scare-text">Xalid Osturax</h1>
+    </div>
+
+    <script>
+        // Səs effekti sintezi (Brauzer daxilində dəhşətli qışqırıq səsi yaratmaq üçün)
+        function playScreamSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Yüksək tezlikli səs dalğası
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(3000, audioCtx.currentTime + 0.1);
+                osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 1.5);
+
+                gain.gain.setValueAtTime(1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 1.5);
+            } catch (e) {
+                console.log("Audio xətası:", e);
+            }
+        }
+
+        function triggerScare() {
+            // Başlanğıc düyməsini gizlədir, qorxu ekranını açır
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('scare-screen').style.display = 'flex';
+
+            // Tam ekran rejiminə keçməyə çalışır
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            }
+
+            // Səs effektini işə salır
+            playScreamSound();
+        }
+
+        // Ekranın hər hansı bir yerinə kliklədikdə də işə düşməsi üçün
+        document.body.addEventListener('click', function(e) {
+            if (document.getElementById('scare-screen').style.display !== 'flex') {
+                triggerScare();
+            }
+        });
+    </script>
+</body>
+</html>
