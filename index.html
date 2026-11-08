@@ -3,183 +3,528 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XRamal</title>
+    <title>Ad Günün Mübarək Xalid!</title>
     <style>
+        :root {
+            --primary: #ff007f;
+            --secondary: #00f0ff;
+            --accent: #ffe600;
+            --bg: #0a0a16;
+        }
+
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            user-select: none;
         }
 
-        body, html {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #000;
-            font-family: 'Arial', sans-serif;
-            cursor: pointer;
-        }
-
-        /* Başlanğıc Ekranı */
-        #start-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+        body {
+            background-color: var(--bg);
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            color: #fff;
-            z-index: 10;
+            justify-content: center;
+            position: relative;
         }
 
-        .btn {
-            padding: 15px 30px;
-            font-size: 20px;
-            color: #fff;
-            background-color: #8b0000;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            box-shadow: 0 0 15px #ff0000;
-            transition: transform 0.2s, background-color 0.2s;
-        }
-
-        .btn:hover {
-            background-color: #ff0000;
-            transform: scale(1.05);
-        }
-
-        /* Qorxutma Ekranı (Jump Scare) */
-        #scare-screen {
-            display: none;
+        /* Fon Kətanı (Canvas) */
+        #canvas {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: #000;
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-
-        /* Titrəmə animasiyası */
-        .shake {
-            animation: shakeAnim 0.05s infinite alternate;
-        }
-
-        @keyframes shakeAnim {
-            0% { transform: translate(10px, 10px) scale(1.1); }
-            100% { transform: translate(-10px, -10px) scale(1.15); }
-        }
-
-        /* Ekranın qırmızı yanıb-sönməsi */
-        .flash {
-            animation: flashAnim 0.1s infinite;
-        }
-
-        @keyframes flashAnim {
-            0% { background-color: #000; }
-            50% { background-color: #ff0000; }
-            100% { background-color: #000; }
-        }
-
-        #scare-img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
+            z-index: 1;
+            pointer-events: none;
         }
 
-        #scare-text {
-            position: absolute;
-            bottom: 10%;
-            width: 100%;
+        /* Əsas Konteyner */
+        .container {
+            position: relative;
+            z-index: 10;
             text-align: center;
-            color: #ff0000;
-            font-size: 80px;
+            padding: 2rem;
+            max-width: 800px;
+            width: 90%;
+        }
+
+        /* Dairəvi Parlama İşığı */
+        .glow-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,0,127,0.3) 0%, rgba(0,240,255,0.2) 50%, rgba(0,0,0,0) 70%);
+            filter: blur(40px);
+            z-index: -1;
+            animation: pulseGlow 4s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+            100% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
+        }
+
+        /* Animasiyalı Başlıq */
+        .title-wrapper {
+            margin-bottom: 2rem;
+            animation: fadeInDown 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .sub-title {
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--secondary);
+            text-shadow: 0 0 10px var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .main-title {
+            font-size: 3.5rem;
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 5px;
-            text-shadow: 0 0 20px #000, 0 0 40px #000, 0 0 10px #ffffff;
-            z-index: 101;
-            font-family: 'Impact', sans-serif;
+            background: linear-gradient(45deg, #ff007f, #ffe600, #00f0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(255, 0, 127, 0.5);
+            animation: titleFloat 3s ease-in-out infinite alternate;
         }
 
-        @media (max-width: 768px) {
-            #scare-text {
-                font-size: 45px;
-            }
+        @keyframes titleFloat {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-10px); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Düymələr Sahəsi */
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+            animation: fadeInUp 1.5s ease-out;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--secondary);
+            color: #fff;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+            outline: none;
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+            color: #000;
+            box-shadow: 0 0 25px var(--secondary);
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        .btn-primary {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 0 25px var(--primary);
+        }
+
+        /* İnteraktiv Tort Styleri */
+        .cake-container {
+            margin: 20px auto;
+            width: 200px;
+            height: 160px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .cake-tier {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 10px 10px 0 0;
+        }
+
+        .tier-bottom {
+            bottom: 0;
+            width: 180px;
+            height: 60px;
+            background: linear-gradient(to right, #ff4081, #ff80ab);
+            border-bottom: 6px solid #c2185b;
+        }
+
+        .tier-top {
+            bottom: 60px;
+            width: 120px;
+            height: 50px;
+            background: linear-gradient(to right, #00e5ff, #18ffff);
+            border-bottom: 6px solid #00b0ff;
+        }
+
+        .candle {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 35px;
+            background: repeating-linear-gradient(45deg, #fff, #fff 5px, #ffe600 5px, #ffe600 10px);
+            border-radius: 3px;
+        }
+
+        .flame {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 18px;
+            background: #ff9100;
+            border-radius: 50% 50% 20% 20%;
+            box-shadow: 0 0 10px #ff9100, 0 0 20px #ff3d00;
+            animation: flicker 0.6s infinite alternate;
+            transition: opacity 0.3s;
+        }
+
+        .flame.off {
+            opacity: 0;
+        }
+
+        @keyframes flicker {
+            0% { transform: translateX(-50%) scale(1) rotate(-2deg); }
+            100% { transform: translateX(-50%) scale(1.1) rotate(2deg); }
+        }
+
+        /* Hədiyyə Qutusu */
+        .gift-section {
+            margin-top: 30px;
+        }
+
+        .gift-box {
+            font-size: 4rem;
+            cursor: pointer;
+            display: inline-block;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: bounce 2s infinite;
+        }
+
+        .gift-box:hover {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-15px); }
+            60% { transform: translateY(-7px); }
+        }
+
+        /* Sürpriz Mesaj Kartı */
+        .message-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: zoomIn 0.5s ease-out forwards;
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Ekran Şarları */
+        .balloon {
+            position: fixed;
+            bottom: -100px;
+            width: 50px;
+            height: 70px;
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            z-index: 5;
+            cursor: pointer;
+            animation: floatUp linear forwards;
+        }
+
+        .balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 15px;
+            background: rgba(255,255,255,0.5);
+        }
+
+        @keyframes floatUp {
+            to { transform: translateY(-120vh) rotate(20deg); }
+        }
+
+        @media (max-width: 600px) {
+            .main-title { font-size: 2.2rem; }
+            .sub-title { font-size: 1rem; }
+            .btn { padding: 10px 18px; font-size: 0.9rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Başlanğıc Ekranı -->
-    <div id="start-screen">
-        <button class="btn" onclick="triggerScare()">Daxil olmaq üçün klikləyin</button>
-    </div>
+    <canvas id="canvas"></canvas>
+    <div class="glow-bg"></div>
 
-    <!-- Qorxutma Ekranı -->
-    <div id="scare-screen" class="shake flash">
-        <img id="scare-img" src="505.jpg" alt="Scare Image" onerror="this.src='https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=1000&auto=format&fit=crop'">
-        <h1 id="scare-text">Got Ramal</h1>
+    <div class="container">
+        <div class="title-wrapper">
+            <div class="sub-title">🎉 Bu gün sənin günündür 🎉</div>
+            <h1 class="main-title">Ad Günün Mübarək<br>Xalid!</h1>
+        </div>
+
+        <!-- İnteraktiv Tort -->
+        <div class="cake-container" onclick="toggleCandle()" title="Şamı söndürmək üçün bas!">
+            <div class="cake-tier tier-bottom"></div>
+            <div class="cake-tier tier-top">
+                <div class="candle">
+                    <div class="flame" id="flame"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="triggerFireworks()">🎆 Fişəng At</button>
+            <button class="btn" onclick="playBirthdayTune()">🎵 Təbrik Musiqisi</button>
+            <button class="btn" onclick="spawnBalloons(10)">🎈 Şarları Artır</button>
+        </div>
+
+        <div class="gift-section">
+            <div class="gift-box" id="giftBox" onclick="openGift()">🎁</div>
+            <div class="message-card" id="messageCard">
+                <h3>Əziz Xalid! ✨</h3>
+                <p style="margin-top: 10px; line-height: 1.6; color: #ddd;">
+                    Yeni yaşında sənə möhkəm cansağlığı, tükənməz enerjisi, böyük uğurlar və bütün arzularının çin olmasını diləyirəm! Həmişə ucalarda olasan! 🚀🎂
+                </p>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Səs effekti sintezi (Brauzer daxilində dəhşətli qışqırıq səsi yaratmaq üçün)
-        function playScreamSound() {
-            try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                
-                // Yüksək tezlikli səs dalğası
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
+        // --- CANVAS VƏ FİŞƏNG EFFEKTLƏRİ ---
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
 
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(3000, audioCtx.currentTime + 0.1);
-                osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 1.5);
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
 
-                gain.gain.setValueAtTime(1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5);
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.radius = Math.random() * 3 + 1;
+                this.velocity = {
+                    x: (Math.random() - 0.5) * 8,
+                    y: (Math.random() - 0.5) * 8
+                };
+                this.alpha = 1;
+                this.decay = Math.random() * 0.015 + 0.005;
+            }
 
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
 
-                osc.start();
-                osc.stop(audioCtx.currentTime + 1.5);
-            } catch (e) {
-                console.log("Audio xətası:", e);
+            update() {
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.velocity.y += 0.05; // cazibə quvvəsi
+                this.alpha -= this.decay;
             }
         }
 
-        function triggerScare() {
-            // Başlanğıc düyməsini gizlədir, qorxu ekranını açır
-            document.getElementById('start-screen').style.display = 'none';
-            document.getElementById('scare-screen').style.display = 'flex';
+        let particles = [];
+        const colors = ['#ff007f', '#00f0ff', '#ffe600', '#7928ca', '#ff0000', '#00ff00'];
 
-            // Tam ekran rejiminə keçməyə çalışır
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen().catch(() => {});
+        function createFirework(x, y) {
+            const particleCount = 60;
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle(x, y, color));
             }
-
-            // Səs effektini işə salır
-            playScreamSound();
         }
 
-        // Ekranın hər hansı bir yerinə kliklədikdə də işə düşməsi üçün
-        document.body.addEventListener('click', function(e) {
-            if (document.getElementById('scare-screen').style.display !== 'flex') {
-                triggerScare();
+        function triggerFireworks() {
+            for(let i=0; i<5; i++) {
+                setTimeout(() => {
+                    createFirework(
+                        Math.random() * width * 0.8 + width * 0.1,
+                        Math.random() * height * 0.5 + height * 0.1
+                    );
+                }, i * 300);
+            }
+        }
+
+        function animate() {
+            ctx.fillStyle = 'rgba(10, 10, 22, 0.2)';
+            ctx.fillRect(0, 0, width, height);
+
+            particles.forEach((particle, index) => {
+                if (particle.alpha > 0) {
+                    particle.update();
+                    particle.draw();
+                } else {
+                    particles.splice(index, 1);
+                }
+            });
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Ekrana tıklandıqda fişəng yaratmaq
+        window.addEventListener('click', (e) => {
+            if (e.target.tagName !== 'BUTTON' && !e.target.classList.contains('gift-box') && !e.target.classList.contains('cake-container')) {
+                createFirework(e.clientX, e.clientY);
             }
         });
+
+        // --- ŞAR ANİMASİYALARI ---
+        function createBalloon() {
+            const balloon = document.createElement('div');
+            balloon.className = 'balloon';
+            
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            balloon.style.backgroundColor = color;
+            balloon.style.boxShadow = `inset -5px -5px 10px rgba(0,0,0,0.3), 0 0 15px ${color}`;
+            
+            balloon.style.left = Math.random() * 90 + 5 + 'vw';
+            const duration = Math.random() * 6 + 6;
+            balloon.style.animationDuration = duration + 's';
+
+            balloon.addEventListener('click', () => {
+                createFirework(balloon.offsetLeft + 25, balloon.offsetTop + 35);
+                balloon.remove();
+            });
+
+            document.body.appendChild(balloon);
+
+            setTimeout(() => {
+                if (balloon.parentNode) balloon.remove();
+            }, duration * 1000);
+        }
+
+        function spawnBalloons(count) {
+            for(let i = 0; i < count; i++) {
+                setTimeout(createBalloon, i * 200);
+            }
+        }
+
+        // Başlanğıcda şarlar və fişənglər buraxmaq
+        window.addEventListener('DOMContentLoaded', () => {
+            spawnBalloons(8);
+            setTimeout(triggerFireworks, 500);
+        });
+
+        // --- İNTERAKTİV DÜYMƏLƏR VƏ HƏDİYYƏ ---
+        function toggleCandle() {
+            const flame = document.getElementById('flame');
+            flame.classList.toggle('off');
+            if(!flame.classList.contains('off')) {
+                const rect = flame.getBoundingClientRect();
+                createFirework(rect.left, rect.top);
+            }
+        }
+
+        function openGift() {
+            const gift = document.getElementById('giftBox');
+            const card = document.getElementById('messageCard');
+            
+            gift.style.animation = 'none';
+            gift.innerHTML = '🎉';
+            card.style.display = 'block';
+            
+            const rect = gift.getBoundingClientRect();
+            triggerFireworks();
+        }
+
+        // --- AUDIO SYNTHESIZER (Təbrik Melodiyası) ---
+        function playBirthdayTune() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+
+            // Happy Birthday notaları
+            const notes = [
+                { note: 261.63, duration: 0.4 }, // C4
+                { note: 261.63, duration: 0.4 }, // C4
+                { note: 293.66, duration: 0.8 }, // D4
+                { note: 261.63, duration: 0.8 }, // C4
+                { note: 349.23, duration: 0.8 }, // F4
+                { note: 329.63, duration: 1.2 }, // E4
+                
+                { note: 261.63, duration: 0.4 }, // C4
+                { note: 261.63, duration: 0.4 }, // C4
+                { note: 293.66, duration: 0.8 }, // D4
+                { note: 261.63, duration: 0.8 }, // C4
+                { note: 392.00, duration: 0.8 }, // G4
+                { note: 349.23, duration: 1.2 }  // F4
+            ];
+
+            let currentTime = ctx.currentTime;
+
+            notes.forEach(item => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(item.note, currentTime);
+
+                gain.gain.setValueAtTime(0.1, currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, currentTime + item.duration - 0.05);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start(currentTime);
+                osc.stop(currentTime + item.duration);
+
+                currentTime += item.duration;
+            });
+        }
     </script>
 </body>
 </html>
