@@ -1,530 +1,231 @@
 <!DOCTYPE html>
 <html lang="az">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ad Günün Mübarək Xalid!</title>
-    <style>
-        :root {
-            --primary: #ff007f;
-            --secondary: #00f0ff;
-            --accent: #ffe600;
-            --bg: #0a0a16;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Xoş Gəldin</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-        }
+    body {
+      background: radial-gradient(circle at center, #141428 0%, #07070f 100%);
+      color: #ffffff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      cursor: pointer;
+    }
 
-        body {
-            background-color: var(--bg);
-            color: #fff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            min-height: 100vh;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
+    /* Arxa fon neon halqaları */
+    .glow-bg {
+      position: absolute;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(0, 240, 255, 0.18), transparent 70%);
+      border-radius: 50%;
+      filter: blur(40px);
+      animation: pulseGlow 4s infinite alternate;
+      transition: background 0.8s ease;
+      z-index: 0;
+    }
 
-        /* Fon Kətanı (Canvas) */
-        #canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
-        }
+    body.prank-active .glow-bg {
+      background: radial-gradient(circle, rgba(255, 0, 60, 0.28), transparent 70%);
+    }
 
-        /* Əsas Konteyner */
-        .container {
-            position: relative;
-            z-index: 10;
-            text-align: center;
-            padding: 2rem;
-            max-width: 800px;
-            width: 90%;
-        }
+    .container {
+      position: relative;
+      z-index: 2;
+      padding: 20px;
+      max-width: 90%;
+    }
 
-        /* Dairəvi Parlama İşığı */
-        .glow-bg {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(255,0,127,0.3) 0%, rgba(0,240,255,0.2) 50%, rgba(0,0,0,0) 70%);
-            filter: blur(40px);
-            z-index: -1;
-            animation: pulseGlow 4s infinite alternate;
-        }
+    /* İlk yazı: Xoş gəldin */
+    #welcome-text {
+      font-size: clamp(2.8rem, 8vw, 5.5rem);
+      font-weight: 800;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #e0f7ff;
+      text-shadow:
+        0 0 10px #00f0ff,
+        0 0 25px #00f0ff,
+        0 0 50px #0077ff;
+      opacity: 0;
+      transform: scale(0.7) translateY(20px);
+      animation: welcomeIn 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
 
-        @keyframes pulseGlow {
-            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
-            100% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
-        }
+    #welcome-text.fade-out {
+      animation: welcomeOut 0.6s ease forwards;
+    }
 
-        /* Animasiyalı Başlıq */
-        .title-wrapper {
-            margin-bottom: 2rem;
-            animation: fadeInDown 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+    /* İkinci yazı: 5 saniyə sonra gələn mesaj */
+    #prank-text {
+      display: none;
+      font-size: clamp(2.2rem, 7vw, 4.8rem);
+      font-weight: 900;
+      line-height: 1.25;
+      color: #fff;
+      text-shadow:
+        0 0 12px #ff003c,
+        0 0 30px #ff003c,
+        0 0 60px #ff5500;
+      opacity: 0;
+    }
 
-        .sub-title {
-            font-size: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            color: var(--secondary);
-            text-shadow: 0 0 10px var(--secondary);
-            margin-bottom: 0.5rem;
-        }
+    #prank-text.show {
+      display: block;
+      animation: slamIn 0.7s cubic-bezier(0.17, 0.89, 0.32, 1.28) forwards;
+    }
 
-        .main-title {
-            font-size: 3.5rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            background: linear-gradient(45deg, #ff007f, #ffe600, #00f0ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(255, 0, 127, 0.5);
-            animation: titleFloat 3s ease-in-out infinite alternate;
-        }
+    /* Ekran titrəmə effekti */
+    .shake {
+      animation: screenShake 0.5s ease-in-out;
+    }
 
-        @keyframes titleFloat {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-10px); }
-        }
+    /* Kiçik səs bildirişi (brauzer autoplay bloklayarsa görünür) */
+    #sound-hint {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      backdrop-filter: blur(8px);
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      color: #bdefff;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+      z-index: 10;
+    }
 
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-50px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    #sound-hint.visible {
+      opacity: 1;
+    }
 
-        /* Düymələr Sahəsi */
-        .controls {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 2rem;
-            animation: fadeInUp 1.5s ease-out;
-        }
+    @keyframes welcomeIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.7) translateY(25px);
+        filter: blur(10px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: blur(0);
+      }
+    }
 
-        .btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid var(--secondary);
-            color: #fff;
-            padding: 12px 24px;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            backdrop-filter: blur(5px);
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
-            outline: none;
-        }
+    @keyframes welcomeOut {
+      0% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1.25);
+        filter: blur(12px);
+      }
+    }
 
-        .btn:hover {
-            background: var(--secondary);
-            color: #000;
-            box-shadow: 0 0 25px var(--secondary);
-            transform: translateY(-3px) scale(1.05);
-        }
+    @keyframes slamIn {
+      0% {
+        opacity: 0;
+        transform: scale(2.2);
+        filter: blur(15px);
+      }
+      70% {
+        opacity: 1;
+        transform: scale(0.95);
+        filter: blur(0);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
 
-        .btn-primary {
-            border-color: var(--primary);
-            box-shadow: 0 0 15px rgba(255, 0, 127, 0.3);
-        }
+    @keyframes screenShake {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      20% { transform: translate(-10px, 6px) rotate(-1deg); }
+      40% { transform: translate(10px, -6px) rotate(1deg); }
+      60% { transform: translate(-8px, -4px) rotate(-0.5deg); }
+      80% { transform: translate(8px, 4px) rotate(0.5deg); }
+    }
 
-        .btn-primary:hover {
-            background: var(--primary);
-            color: #fff;
-            box-shadow: 0 0 25px var(--primary);
-        }
-
-        /* İnteraktiv Tort Styleri */
-        .cake-container {
-            margin: 20px auto;
-            width: 200px;
-            height: 160px;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .cake-tier {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            border-radius: 10px 10px 0 0;
-        }
-
-        .tier-bottom {
-            bottom: 0;
-            width: 180px;
-            height: 60px;
-            background: linear-gradient(to right, #ff4081, #ff80ab);
-            border-bottom: 6px solid #c2185b;
-        }
-
-        .tier-top {
-            bottom: 60px;
-            width: 120px;
-            height: 50px;
-            background: linear-gradient(to right, #00e5ff, #18ffff);
-            border-bottom: 6px solid #00b0ff;
-        }
-
-        .candle {
-            position: absolute;
-            top: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 12px;
-            height: 35px;
-            background: repeating-linear-gradient(45deg, #fff, #fff 5px, #ffe600 5px, #ffe600 10px);
-            border-radius: 3px;
-        }
-
-        .flame {
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 12px;
-            height: 18px;
-            background: #ff9100;
-            border-radius: 50% 50% 20% 20%;
-            box-shadow: 0 0 10px #ff9100, 0 0 20px #ff3d00;
-            animation: flicker 0.6s infinite alternate;
-            transition: opacity 0.3s;
-        }
-
-        .flame.off {
-            opacity: 0;
-        }
-
-        @keyframes flicker {
-            0% { transform: translateX(-50%) scale(1) rotate(-2deg); }
-            100% { transform: translateX(-50%) scale(1.1) rotate(2deg); }
-        }
-
-        /* Hədiyyə Qutusu */
-        .gift-section {
-            margin-top: 30px;
-        }
-
-        .gift-box {
-            font-size: 4rem;
-            cursor: pointer;
-            display: inline-block;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            animation: bounce 2s infinite;
-        }
-
-        .gift-box:hover {
-            transform: scale(1.2) rotate(5deg);
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-15px); }
-            60% { transform: translateY(-7px); }
-        }
-
-        /* Sürpriz Mesaj Kartı */
-        .message-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
-            display: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            animation: zoomIn 0.5s ease-out forwards;
-        }
-
-        @keyframes zoomIn {
-            from { opacity: 0; transform: scale(0.5); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        /* Ekran Şarları */
-        .balloon {
-            position: fixed;
-            bottom: -100px;
-            width: 50px;
-            height: 70px;
-            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
-            z-index: 5;
-            cursor: pointer;
-            animation: floatUp linear forwards;
-        }
-
-        .balloon::after {
-            content: '';
-            position: absolute;
-            bottom: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 2px;
-            height: 15px;
-            background: rgba(255,255,255,0.5);
-        }
-
-        @keyframes floatUp {
-            to { transform: translateY(-120vh) rotate(20deg); }
-        }
-
-        @media (max-width: 600px) {
-            .main-title { font-size: 2.2rem; }
-            .sub-title { font-size: 1rem; }
-            .btn { padding: 10px 18px; font-size: 0.9rem; }
-        }
-    </style>
+    @keyframes pulseGlow {
+      0% { transform: scale(0.9); opacity: 0.7; }
+      100% { transform: scale(1.2); opacity: 1; }
+    }
+  </style>
 </head>
 <body>
+  <div class="glow-bg"></div>
 
-    <canvas id="canvas"></canvas>
-    <div class="glow-bg"></div>
+  <div class="container">
+    <h1 id="welcome-text">Xoş gəldin</h1>
+    <h1 id="prank-text">Xalid adamın başına bele sıcirlar</h1>
+  </div>
 
-    <div class="container">
-        <div class="title-wrapper">
-            <div class="sub-title">🎉 Bu gün sənin günündür 🎉</div>
-            <h1 class="main-title">Ad Günün Mübarək<br>Xalid!</h1>
-        </div>
+  <div id="sound-hint">🔊 Səsi aktivləşdirmək üçün ekrana toxun</div>
 
-        <!-- İnteraktiv Tort -->
-        <div class="cake-container" onclick="toggleCandle()" title="Şamı söndürmək üçün bas!">
-            <div class="cake-tier tier-bottom"></div>
-            <div class="cake-tier tier-top">
-                <div class="candle">
-                    <div class="flame" id="flame"></div>
-                </div>
-            </div>
-        </div>
+  <!-- Arxa fon səsi -->
+  <audio id="bg-audio" src="xalid.m4a" preload="auto" loop></audio>
 
-        <div class="controls">
-            <button class="btn btn-primary" onclick="triggerFireworks()">🎆 Fişəng At</button>
-            <button class="btn" onclick="playBirthdayTune()">🎵 Təbrik Musiqisi</button>
-            <button class="btn" onclick="spawnBalloons(10)">🎈 Şarları Artır</button>
-        </div>
+  <script>
+    const audio = document.getElementById('bg-audio');
+    const welcomeText = document.getElementById('welcome-text');
+    const prankText = document.getElementById('prank-text');
+    const soundHint = document.getElementById('sound-hint');
+    let audioStarted = false;
 
-        <div class="gift-section">
-            <div class="gift-box" id="giftBox" onclick="openGift()">🎁</div>
-            <div class="message-card" id="messageCard">
-                <h3>Əziz Xalid! ✨</h3>
-                <p style="margin-top: 10px; line-height: 1.6; color: #ddd;">
-                    Yeni yaşında sənə möhkəm cansağlığı, tükənməz enerjisi, böyük uğurlar və bütün arzularının çin olmasını diləyirəm! Həmişə ucalarda olasan! 🚀🎂
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // --- CANVAS VƏ FİŞƏNG EFFEKTLƏRİ ---
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        let width = canvas.width = window.innerWidth;
-        let height = canvas.height = window.innerHeight;
-
-        window.addEventListener('resize', () => {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
+    // Səsi işə salma funksiyası
+    function playAudio() {
+      if (audioStarted) return;
+      audio.play()
+        .then(() => {
+          audioStarted = true;
+          soundHint.classList.remove('visible');
+        })
+        .catch(() => {
+          // Brauzer avtomatik səsi bloklasa bildiriş göstər
+          soundHint.classList.add('visible');
         });
+    }
 
-        class Particle {
-            constructor(x, y, color) {
-                this.x = x;
-                this.y = y;
-                this.color = color;
-                this.radius = Math.random() * 3 + 1;
-                this.velocity = {
-                    x: (Math.random() - 0.5) * 8,
-                    y: (Math.random() - 0.5) * 8
-                };
-                this.alpha = 1;
-                this.decay = Math.random() * 0.015 + 0.005;
-            }
+    // Səhifə yüklənəndə səsi başlatmağa cəhd et
+    window.addEventListener('DOMContentLoaded', () => {
+      playAudio();
 
-            draw() {
-                ctx.save();
-                ctx.globalAlpha = this.alpha;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = this.color;
-                ctx.fill();
-                ctx.restore();
-            }
+      // 5 saniyə sonra yazını dəyiş
+      setTimeout(() => {
+        welcomeText.classList.add('fade-out');
 
-            update() {
-                this.x += this.velocity.x;
-                this.y += this.velocity.y;
-                this.velocity.y += 0.05; // cazibə quvvəsi
-                this.alpha -= this.decay;
-            }
-        }
+        setTimeout(() => {
+          welcomeText.style.display = 'none';
+          document.body.classList.add('prank-active', 'shake');
+          prankText.classList.add('show');
+        }, 550);
+      }, 5000);
+    });
 
-        let particles = [];
-        const colors = ['#ff007f', '#00f0ff', '#ffe600', '#7928ca', '#ff0000', '#00ff00'];
-
-        function createFirework(x, y) {
-            const particleCount = 60;
-            const color = colors[Math.floor(Math.random() * colors.length)];
-            for (let i = 0; i < particleCount; i++) {
-                particles.push(new Particle(x, y, color));
-            }
-        }
-
-        function triggerFireworks() {
-            for(let i=0; i<5; i++) {
-                setTimeout(() => {
-                    createFirework(
-                        Math.random() * width * 0.8 + width * 0.1,
-                        Math.random() * height * 0.5 + height * 0.1
-                    );
-                }, i * 300);
-            }
-        }
-
-        function animate() {
-            ctx.fillStyle = 'rgba(10, 10, 22, 0.2)';
-            ctx.fillRect(0, 0, width, height);
-
-            particles.forEach((particle, index) => {
-                if (particle.alpha > 0) {
-                    particle.update();
-                    particle.draw();
-                } else {
-                    particles.splice(index, 1);
-                }
-            });
-
-            requestAnimationFrame(animate);
-        }
-        animate();
-
-        // Ekrana tıklandıqda fişəng yaratmaq
-        window.addEventListener('click', (e) => {
-            if (e.target.tagName !== 'BUTTON' && !e.target.classList.contains('gift-box') && !e.target.classList.contains('cake-container')) {
-                createFirework(e.clientX, e.clientY);
-            }
-        });
-
-        // --- ŞAR ANİMASİYALARI ---
-        function createBalloon() {
-            const balloon = document.createElement('div');
-            balloon.className = 'balloon';
-            
-            const color = colors[Math.floor(Math.random() * colors.length)];
-            balloon.style.backgroundColor = color;
-            balloon.style.boxShadow = `inset -5px -5px 10px rgba(0,0,0,0.3), 0 0 15px ${color}`;
-            
-            balloon.style.left = Math.random() * 90 + 5 + 'vw';
-            const duration = Math.random() * 6 + 6;
-            balloon.style.animationDuration = duration + 's';
-
-            balloon.addEventListener('click', () => {
-                createFirework(balloon.offsetLeft + 25, balloon.offsetTop + 35);
-                balloon.remove();
-            });
-
-            document.body.appendChild(balloon);
-
-            setTimeout(() => {
-                if (balloon.parentNode) balloon.remove();
-            }, duration * 1000);
-        }
-
-        function spawnBalloons(count) {
-            for(let i = 0; i < count; i++) {
-                setTimeout(createBalloon, i * 200);
-            }
-        }
-
-        // Başlanğıcda şarlar və fişənglər buraxmaq
-        window.addEventListener('DOMContentLoaded', () => {
-            spawnBalloons(8);
-            setTimeout(triggerFireworks, 500);
-        });
-
-        // --- İNTERAKTİV DÜYMƏLƏR VƏ HƏDİYYƏ ---
-        function toggleCandle() {
-            const flame = document.getElementById('flame');
-            flame.classList.toggle('off');
-            if(!flame.classList.contains('off')) {
-                const rect = flame.getBoundingClientRect();
-                createFirework(rect.left, rect.top);
-            }
-        }
-
-        function openGift() {
-            const gift = document.getElementById('giftBox');
-            const card = document.getElementById('messageCard');
-            
-            gift.style.animation = 'none';
-            gift.innerHTML = '🎉';
-            card.style.display = 'block';
-            
-            const rect = gift.getBoundingClientRect();
-            triggerFireworks();
-        }
-
-        // --- AUDIO SYNTHESIZER (Təbrik Melodiyası) ---
-        function playBirthdayTune() {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            if (!AudioContext) return;
-            const ctx = new AudioContext();
-
-            // Happy Birthday notaları
-            const notes = [
-                { note: 261.63, duration: 0.4 }, // C4
-                { note: 261.63, duration: 0.4 }, // C4
-                { note: 293.66, duration: 0.8 }, // D4
-                { note: 261.63, duration: 0.8 }, // C4
-                { note: 349.23, duration: 0.8 }, // F4
-                { note: 329.63, duration: 1.2 }, // E4
-                
-                { note: 261.63, duration: 0.4 }, // C4
-                { note: 261.63, duration: 0.4 }, // C4
-                { note: 293.66, duration: 0.8 }, // D4
-                { note: 261.63, duration: 0.8 }, // C4
-                { note: 392.00, duration: 0.8 }, // G4
-                { note: 349.23, duration: 1.2 }  // F4
-            ];
-
-            let currentTime = ctx.currentTime;
-
-            notes.forEach(item => {
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(item.note, currentTime);
-
-                gain.gain.setValueAtTime(0.1, currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, currentTime + item.duration - 0.05);
-
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-
-                osc.start(currentTime);
-                osc.stop(currentTime + item.duration);
-
-                currentTime += item.duration;
-            });
-        }
-    </script>
+    // İstifadəçi ekrana toxunarsa və ya klikləyərsə səsi dərhal başlat
+    ['click', 'touchstart', 'keydown'].forEach(evt => {
+      document.addEventListener(evt, playAudio, { once: false });
+    });
+  </script>
 </body>
 </html>
